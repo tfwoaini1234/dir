@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "自动整理小程序", "自动整理小程序\自动整理小程序.csproj", "{799AFA1A-D206-4832-B4C8-F88A6C3CD7B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{799AFA1A-D206-4832-B4C8-F88A6C3CD7B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{799AFA1A-D206-4832-B4C8-F88A6C3CD7B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{799AFA1A-D206-4832-B4C8-F88A6C3CD7B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{799AFA1A-D206-4832-B4C8-F88A6C3CD7B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D19BD1A9-98FD-415A-B270-BDFA203CE851}
+	EndGlobalSection
+EndGlobal
