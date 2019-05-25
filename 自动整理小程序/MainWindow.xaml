@@ -7,9 +7,16 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="选择文件夹" HorizontalAlignment="Left" Margin="620,10,0,0" VerticalAlignment="Top" Width="162" Height="71" Click="Button_Click"/>
-        <TextBlock x:Name="path_text" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="71" Width="605"/>
-        <TextBox x:Name="log" HorizontalAlignment="Left" Height="323" Margin="10,86,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="772"/>
+        <Button Content="选择文件夹" HorizontalAlignment="Left" Margin="620,10,0,0" VerticalAlignment="Top" Width="162" Height="32" Click="Button_Click"/>
+        <TextBlock x:Name="basePathText" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="还未选择文件夹" VerticalAlignment="Top" Height="32" Width="605"/>
+        <TextBox x:Name="log" HorizontalAlignment="Left" Height="281" Margin="10,128,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="772"/>
+        <CheckBox Content="图片" x:Name="checkImage"  HorizontalAlignment="Left" Margin="10,97,0,0" VerticalAlignment="Top" Checked="CheckBox_Checked"/>
+        <CheckBox Content="视频"  x:Name="checkVideo" HorizontalAlignment="Left" Margin="89,97,0,0" VerticalAlignment="Top" Checked="checkVideo_Checked"/>
+        <CheckBox Content="其他文件"  x:Name="checkOther" HorizontalAlignment="Left" Margin="238,97,0,0" VerticalAlignment="Top" Checked="checkOther_Checked"/>
+        <TextBlock x:Name="savePathText" HorizontalAlignment="Left" Margin="10,47,0,0" TextWrapping="Wrap" Text="还未选择目标文件夹" VerticalAlignment="Top" Height="32" Width="605"/>
+        <Button  Content="选择目标文件夹" HorizontalAlignment="Left" Margin="620,47,0,0" VerticalAlignment="Top" Width="162" Height="32" Click="Button_Click_2" />
+        <Button Content="开始" HorizontalAlignment="Left" Margin="620,84,0,0" VerticalAlignment="Top" Width="162" Height="39" Click="Button_Click_1"/>
+        <CheckBox Content="音乐"  x:Name="checkMusic" HorizontalAlignment="Left" Margin="164,97,0,0" VerticalAlignment="Top" Checked="checkMusic_Checked"/>
 
     </Grid>
 </Window>
