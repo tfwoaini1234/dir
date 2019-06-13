@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.168
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "自动上传图片工具", "自动上传图片工具\自动上传图片工具.csproj", "{97DC4C0E-3A16-49DF-B2C6-76158A1B0114}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "安装包", "安装包\安装包.vdproj", "{E8639B4B-D2BD-40A1-9E88-C7B5A62B8C3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97DC4C0E-3A16-49DF-B2C6-76158A1B0114}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97DC4C0E-3A16-49DF-B2C6-76158A1B0114}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97DC4C0E-3A16-49DF-B2C6-76158A1B0114}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97DC4C0E-3A16-49DF-B2C6-76158A1B0114}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8639B4B-D2BD-40A1-9E88-C7B5A62B8C3A}.Debug|Any CPU.ActiveCfg = Debug
+		{E8639B4B-D2BD-40A1-9E88-C7B5A62B8C3A}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47C9DA49-72F9-4FF9-A178-0A281EBEDCAF}
+	EndGlobalSection
+EndGlobal
