@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SevenZip;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -39,8 +40,32 @@ namespace 解压小程序
             }
         }
 
+        public void Write(string path,string content)
+        {
+            if(File.Exists(path)){
+                StreamWriter sw = new StreamWriter(path, true, Encoding.Default);
+                sw.WriteLine(content, true);
+                sw.Close();
+            }
+            else
+            {
+                FileStream fs = new FileStream(path, FileMode.OpenOrCreate);
+                fs.Close();
+                StreamWriter sw = new StreamWriter(path, true, Encoding.Default);
+                sw.WriteLine(content, true);
+                sw.Close();
+            }
+          
+            
+    
+           
+        }
+
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+
+            
+
 
             log.Text = "";
             try
@@ -82,26 +107,45 @@ namespace 解压小程序
             //先遍历当前文件夹的文件
             foreach (FileInfo fileInfo in TheFolder.GetFiles())
             {
-                    //是图片，开始上传信息
-                    try
+                //是图片，开始上传信息
+                try
+                {
+                    string ext = fileInfo.Extension;
+                    if(ext == ".7z")
                     {
-
-                        this.Dispatcher.Invoke(new Action(delegate {
+                    string s = "";
+                    this.Dispatcher.Invoke(new Action(delegate {
+                        //这里写代码
+                        s = password.Text;
+                    }));
+                    using (var tmp = new SevenZipExtractor(@fileInfo.FullName, s))
+                        {
+                            for (var i = 0; i < tmp.ArchiveFileData.Count; i++)
+                            {
+                            string str = fileInfo.DirectoryName+@"\压缩\";
+                                tmp.ExtractFiles(str, tmp.ArchiveFileData[i].Index);
+                            }
+                        }
+                        this.Dispatcher.BeginInvoke(new Action(delegate {
                             //这里写代码
-                            log.Text += fileInfo.Name + "设置成功\r\n";
+                            log.Text += fileInfo.Name + "解压成功\r\n";
                             log.ScrollToEnd();
                         }));
                     }
-                    catch (Exception ex)
+                   
+                }
+                catch (Exception ex)
+               {
+                    this.Dispatcher.BeginInvoke(new Action(delegate
                     {
-                        this.Dispatcher.Invoke(new Action(delegate {
-                            //这里写代码
-                            log.Text += fileInfo.Name + "出错拉\r\n";
-                            log.ScrollToEnd();
-                        }));
-                    }
+                        Write(dirPath+"/error.txt",fileInfo.FullName);
+                        //这里写代码
+                        log.Text += fileInfo.Name + "解压失败\r\n";
+                        log.ScrollToEnd();
+                    }));
+               }
 
-           
+
             }
             //遍历文件夹
             foreach (DirectoryInfo NextFolder in TheFolder.GetDirectories())
