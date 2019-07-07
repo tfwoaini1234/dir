@@ -1,0 +1,17 @@
+﻿<Window x:Class="自动生成目录小工具.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:自动生成目录小工具"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="460" Width="810"
+        ResizeMode="NoResize"
+        >
+    <Grid>
+        <TextBlock x:Name="dirName" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="选中的文件夹" VerticalAlignment="Top" Height="38" Width="567" FontSize="20"/>
+        <Button Content="选择文件夹" Background="Azure"  HorizontalAlignment="Left" Margin="582,10,0,0" VerticalAlignment="Top" Width="100" Height="38" Click="Button_Click"/>
+        <Button Content="开始上传" Background="LightBlue" HorizontalAlignment="Left" Margin="686,10,0,0" VerticalAlignment="Top" Width="100" Height="38" Click="Button_Click_1"/>
+        <TextBox x:Name="log" HorizontalAlignment="Left" Height="356" Margin="10,53,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="772"/>
+    </Grid>
+</Window>
