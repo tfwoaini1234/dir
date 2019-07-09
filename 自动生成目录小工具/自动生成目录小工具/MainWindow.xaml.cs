@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace 自动生成目录小工具
 {
@@ -22,12 +23,32 @@ namespace 自动生成目录小工具
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string dirPath = "";
+        private string dirPath = "E:/媒体库/视频/新番/";
         private string savePath = "D:/www/center/public/static/video/";
         private bool kg = true;
+        private DispatcherTimer dispatcherTimer;
         public MainWindow()
         {
             InitializeComponent();
+            //while (true)
+            //{
+
+            //        //这里写代码
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(scanning);
+            dispatcherTimer.Interval = new TimeSpan(1, 0, 0);
+            dispatcherTimer.Start();
+            
+
+            //    //Thread.Sleep(200);
+            //}
+        }
+        private void scanning(object sender, EventArgs e) {
+            dispatcherTimer.Stop();
+            eachDir();
+            dispatcherTimer.Start();
+            log.Text += DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss") +"刷新了一次\r\n";
+                 log.ScrollToEnd();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -108,7 +129,7 @@ namespace 自动生成目录小工具
                             //删除目标目录文件，重新复制
                             fileInfo2.Delete();
                             File.Copy(fileInfo.FullName, fPath);
-                            this.Dispatcher.InvokeAsync(new Action(delegate
+                            this.Dispatcher.Invoke(new Action(delegate
                             {
                                 //这里写代码
                                 log.Text += fileInfo.Name + "文件大小不对，重新复制\r\n";
@@ -117,7 +138,7 @@ namespace 自动生成目录小工具
                         }
                         else
                         {
-                            this.Dispatcher.InvokeAsync(new Action(delegate
+                            this.Dispatcher.Invoke(new Action(delegate
                             {
                                 //这里写代码
                                 log.Text += fileInfo.Name + "已存在\r\n";
@@ -129,7 +150,7 @@ namespace 自动生成目录小工具
                     {
                         //如果文件不存在，直接复制
                         File.Copy(fileInfo.FullName, fPath);
-                        this.Dispatcher.InvokeAsync(new Action(delegate
+                        this.Dispatcher.Invoke(new Action(delegate
                         {
                             //这里写代码
                             log.Text += fileInfo.Name + "复制成功\r\n";
