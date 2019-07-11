@@ -27,6 +27,7 @@ namespace 自动生成目录小工具
         private string savePath = "D:/www/center/public/static/video/";
         private bool kg = true;
         private DispatcherTimer dispatcherTimer;
+        private int copyNum = 0;
         public MainWindow()
         {
             InitializeComponent();
@@ -44,11 +45,12 @@ namespace 自动生成目录小工具
             //}
         }
         private void scanning(object sender, EventArgs e) {
+            log.Text = "";
             dispatcherTimer.Stop();
             eachDir();
             dispatcherTimer.Start();
             log.Text += DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss") +"刷新了一次\r\n";
-                 log.ScrollToEnd();
+            log.ScrollToEnd();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -94,11 +96,15 @@ namespace 自动生成目录小工具
         }
         public void eachDir()
         {
-           
+
+            copyNum = 0;
             each(dirPath,"");
             kg = true;
-            //请求网页刷新列表
-            HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+            if (copyNum > 0) {
+                //如果 有复制文件，请求网页刷新列表
+                HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+            }
+            copyNum = 0;
         }
 
         private void each(string path,string p)
@@ -150,6 +156,7 @@ namespace 自动生成目录小工具
                     {
                         //如果文件不存在，直接复制
                         File.Copy(fileInfo.FullName, fPath);
+                        copyNum++;
                         this.Dispatcher.Invoke(new Action(delegate
                         {
                             //这里写代码
