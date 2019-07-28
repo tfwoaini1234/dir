@@ -31,18 +31,27 @@ namespace 自动生成目录小工具
         public MainWindow()
         {
             InitializeComponent();
+            shuaxin();
             //while (true)
             //{
 
             //        //这里写代码
-            dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(scanning);
-            dispatcherTimer.Interval = new TimeSpan(1, 0, 0);
-            dispatcherTimer.Start();
-            
+            //dispatcherTimer = new DispatcherTimer();
+            //dispatcherTimer.Tick += new EventHandler(scanning);
+            //dispatcherTimer.Interval = new TimeSpan(1, 0, 0);
+            //dispatcherTimer.Start();
+
 
             //    //Thread.Sleep(200);
             //}
+        }
+
+        private void shuaxin() {
+            while (true)
+            {
+                eachDir();
+                Thread.Sleep(1000*3600);
+            }
         }
         private void scanning(object sender, EventArgs e) {
             log.Text = "";
@@ -103,6 +112,11 @@ namespace 自动生成目录小工具
             if (copyNum > 0) {
                 //如果 有复制文件，请求网页刷新列表
                 HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+            }
+            else
+            {
+                //如果 没有复制文件，请求网页刷新列表
+                HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/updateTime", "");
             }
             copyNum = 0;
         }
