@@ -27,6 +27,7 @@ namespace 拼多多统计合计小工具
     {
         private string fileDir = "";
         private string fileName = "";
+        private string apiUrl = "http://video.zxchobits.com:8282/";
         public MainWindow()
         {
             InitializeComponent();
@@ -40,7 +41,8 @@ namespace 拼多多统计合计小工具
             if (dialog.ShowDialog() == true)
             {
                 dir.Text = dialog.FileName;
-                Upload(dir.Text);
+                log.Text = "开始上传文件";
+               Upload(dir.Text);
 
             }
         }
@@ -50,7 +52,7 @@ namespace 拼多多统计合计小工具
             FileInfo info = new FileInfo(file);
              fileDir = info.DirectoryName;
             fileName = info.Name;
-            string url = string.Format("http://center.com:8111/pdd/Upload/index");
+            string url = string.Format(apiUrl+"pdd/Upload/index");
             WebClient client = new WebClient();
             client.Credentials = CredentialCache.DefaultCredentials;
             client.UploadFileAsync(new Uri(url), file);
@@ -61,9 +63,11 @@ namespace 拼多多统计合计小工具
             try
             {
                 string reply = System.Text.Encoding.UTF8.GetString(e.Result);
-                if (HttpFileExist("http://center.com:8111/" + reply))
+                if (HttpFileExist(apiUrl + reply))
                 {
-                    DownloadHttpFile("http://center.com:8111/" + reply, @fileDir+"\\"+ fileName + "1.xlsx");
+                    log.Text = "开始下载文件";
+                    DownloadHttpFile(apiUrl + reply, @fileDir+"\\"+ fileName + "统计后.xlsx");
+                    log.Text = "文件已放在" + fileDir + "\\" + fileName + "统计后.xlsx";
                 }
                 if (e.Error != null)
                 {
@@ -71,7 +75,7 @@ namespace 拼多多统计合计小工具
                 }
                 else
                 {
-                    MessageBox.Show("上传成功！");
+                   // MessageBox.Show("上传成功！");
                 }
             }
             catch (Exception e1) {
