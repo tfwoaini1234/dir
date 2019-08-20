@@ -5,6 +5,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -15,328 +16,223 @@ namespace 拼多多统计合计小工具
     /// </summary>
     public class CsvHelper
     {
-        private ArrayList rowAL; //行链表,CSV文件的每一行就是一个链
-        private string fileName; //文件名
-        public DataTable csvDT = new DataTable();
-        private Encoding encoding; //编码
-        public DataTable table = new DataTable();
-        bool IsFirst = true;
-        List<ArrayList> arry = new List<ArrayList>();
-        public CsvHelper()
-        {
-            this.rowAL = new ArrayList();
-            this.fileName = "";
-            this.encoding = Encoding.Default;
-        }
-
         /// <summary>
-        ///
+        /// 字符串是否包含奇数个引号
         /// </summary>
-        /// <param name="fileName">文件名,包括文件路径</param>
-        public CsvHelper(string fileName)
-        {
-            this.rowAL = new ArrayList();
-            this.fileName = fileName;
-            this.encoding = Encoding.Default;
-            LoadCsvFile();
-            DataView dataView = csvDT.DefaultView;
-            //dataView.Sort = "ID desc";
-            csvDT = dataView.ToTable();
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="fileName">文件名,包括文件路径</param>
-        /// <param name="encoding">文件编码</param>
-        public CsvHelper(string fileName, Encoding encoding)
-        {
-            this.rowAL = new ArrayList();
-            this.fileName = fileName;
-            this.encoding = encoding;
-            LoadCsvFile();
-        }
-
-        /// <summary>
-        /// 载入CSV文件
-        /// </summary>
-        private void LoadCsvFile()
-        {
-            //对数据的有效性进行验证
-
-            if (this.fileName == null)
-            {
-                throw new Exception("请指定要载入的CSV文件名");
-            }
-            else if (!File.Exists(this.fileName))
-            {
-                throw new Exception("指定的CSV文件不存在");
-            }
-            else
-            {
-            }
-            if (this.encoding == null)
-            {
-                this.encoding = Encoding.Default;
-            }
-            DataTable dt = new DataTable();
-            StreamReader sr = new StreamReader(this.fileName, this.encoding);
-            string csvDataLine;
-
-            csvDataLine = "";
-            while (true)
-            {
-                string fileDataLine;
-
-                fileDataLine = sr.ReadLine();
-                if (fileDataLine == null)
-                {
-                    break;
-                }
-                if (csvDataLine == "")
-                {
-                    csvDataLine = fileDataLine;//GetDeleteQuotaDataLine(fileDataLine);
-                }
-                else
-                {
-                    csvDataLine += "\r\n" + fileDataLine;//GetDeleteQuotaDataLine(fileDataLine);
-                }
-                //如果包含偶数个引号，说明该行数据中出现回车符或包含逗号
-                if (!IfOddQuota(csvDataLine))
-                {
-                    AddNewDataLine(csvDataLine);
-
-                    csvDataLine = "";
-                }
-            }
-            sr.Close();
-            //数据行出现奇数个引号
-            if (csvDataLine.Length > 0)
-            {
-                throw new Exception("CSV文件的格式有错误");
-            }
-        }
-
-        /// <summary>
-        /// 获取两个连续引号变成单个引号的数据行
-        /// </summary>
-        /// <param name="fileDataLine">文件数据行</param>
+        /// <param name="str">相关字符串</param>
         /// <returns></returns>
-        private string GetDeleteQuotaDataLine(string fileDataLine)
+        private static bool _isOddDoubleQuota(string str)
         {
-            return fileDataLine.Replace("\"\"", "\"");
+            return _getDoubleQuotaCount(str) % 2 == 1;
         }
 
-        /// <summary>
-        /// 判断字符串是否包含奇数个引号
-        /// </summary>
-        /// <param name="dataLine">数据行</param>
-        /// <returns>为奇数时，返回为真；否则返回为假</returns>
-        private bool IfOddQuota(string dataLine)
+        private static int _getDoubleQuotaCount(string str)
         {
-            int quotaCount;
-            bool oddQuota;
-
-            quotaCount = 0;
-            for (int i = 0; i < dataLine.Length; i++)
-            {
-                if (dataLine[i] == '\"')
-                {
-                    quotaCount++;
-                }
-            }
-
-            oddQuota = false;
-            if (quotaCount % 2 == 1)
-            {
-                oddQuota = true;
-            }
-
-            return oddQuota;
+            string[] strArray = str.Split('"');
+            int doubleQuotaCount = strArray.Length - 1;
+            doubleQuotaCount = doubleQuotaCount < 0 ? 0 : doubleQuotaCount;
+            return doubleQuotaCount;
         }
 
-        /// <summary>
-        /// 判断是否以奇数个引号开始
-
-        /// </summary>
-        /// <param name="dataCell"></param>
-        /// <returns></returns>
-        private bool IfOddStartQuota(string dataCell)
+        /**
+         * csv的每一行的每一项的引号个数必定为偶数
+    　　　* 生成的Dictionary<string,List<string>>以每一列的第一行元素作为key,其它元素的集合作为value
+         */
+        public static Dictionary<string, List<string>> AnalysisCsvByStr(string csvInfo)
         {
-            int quotaCount;
-            bool oddQuota;
-
-            quotaCount = 0;
-            for (int i = 0; i < dataCell.Length; i++)
+            //首行的每列数据项作为字典的Key
+            Dictionary<string, List<string>> csvInfoDic = new Dictionary<string, List<string>>();
+            Regex regex = new Regex(@"\r\n");
+            string[] infoLines = regex.Split(csvInfo);
+            List<string>[] itemListArray = new List<string>[0];
+            for (int i = 0, length = infoLines.Length; i < length; i++)
             {
-                if (dataCell[i] == '\"')
+                if (string.IsNullOrEmpty(infoLines[i]))
                 {
-                    quotaCount++;
+                    continue;
                 }
-                else
+                string[] lineInfoArray = infoLines[i].Split(',');
+                List<string> rowItemList = new List<string>();
+                string strTemp = string.Empty;
+                for (int j = 0; j < lineInfoArray.Length; j++)
                 {
-                    break;
-                }
-            }
-
-            oddQuota = false;
-            if (quotaCount % 2 == 1)
-            {
-                oddQuota = true;
-            }
-
-            return oddQuota;
-        }
-
-        /// <summary>
-        /// 判断是否以奇数个引号结尾
-        /// </summary>
-        /// <param name="dataCell"></param>
-        /// <returns></returns>
-        private bool IfOddEndQuota(string dataCell)
-        {
-            int quotaCount;
-            bool oddQuota;
-
-            quotaCount = 0;
-            for (int i = dataCell.Length - 1; i >= 0; i--)
-            {
-                if (dataCell[i] == '\"')
-                {
-                    quotaCount++;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            oddQuota = false;
-            if (quotaCount % 2 == 1)
-            {
-                oddQuota = true;
-            }
-
-            return oddQuota;
-        }
-
-        /// <summary>
-        /// 加入新的数据行
-        /// </summary>
-        /// <param name="newDataLine">新的数据行</param>
-        private void AddNewDataLine(string newDataLine)
-        {
-            int Column = 0;
-            DataRow Row = csvDT.NewRow();
-            ArrayList colAL = new ArrayList();
-            string[] dataArray = newDataLine.Split(',');
-            bool oddStartQuota; //是否以奇数个引号开始
-            string cellData;
-
-            oddStartQuota = false;
-            cellData = "";
-
-            for (int j = 0; j < dataArray.Length; j++)
-            {
-                if (IsFirst)
-                {
-                    DataColumn dc = new DataColumn(dataArray[j]);
-                    csvDT.Columns.Add(dc);
-                }
-                else
-                {
-                    if (oddStartQuota)
+                    strTemp += lineInfoArray[j];
+                    if (_isOddDoubleQuota(strTemp))
                     {
-                        //因为前面用逗号分割,所以要加上逗号
-                        cellData += "," + dataArray[j];
-                        //是否以奇数个引号结尾
-                        if (IfOddEndQuota(dataArray[j]))
+                        if (j != lineInfoArray.Length - 1)
                         {
-
-                            Row[Column] = GetHandleData(cellData);
-                            Column++;
-                            oddStartQuota = false;
-                            continue;
+                            strTemp += ",";
                         }
                     }
                     else
                     {
-                        //是否以奇数个引号开始
-                        if (IfOddStartQuota(dataArray[j]))
+                        if (strTemp.StartsWith("\"") && strTemp.EndsWith("\""))
                         {
-                            //是否以奇数个引号结尾,不能是一个双引号,并且不是奇数个引号
-
-                            if (IfOddEndQuota(dataArray[j]) && dataArray[j].Length > 2 && !IfOddQuota(dataArray[j]))
-                            {
-
-                                Row[Column] = GetHandleData(dataArray[j]);
-                                Column++;
-                                oddStartQuota = false;
-                                continue;
-                            }
-                            else
-                            {
-                                oddStartQuota = true;
-                                cellData = dataArray[j];
-                                continue;
-                            }
+                            strTemp = strTemp.Substring(1, strTemp.Length - 2);
                         }
-                        else
-                        {
-                            Row[Column] = GetHandleData(dataArray[j]);
-                            Column++;
-                        }
+                        rowItemList.Add(strTemp);
+                        strTemp = string.Empty;
                     }
-
+                }
+                if (i == 0)
+                {
+                    itemListArray = new List<string>[rowItemList.Count];
+                    for (int temp = 0; temp < itemListArray.Length; temp++)
+                    {
+                        itemListArray[temp] = new List<string>();
+                    }
+                }
+                int indexTemp = 0;
+                for (; indexTemp < rowItemList.Count; indexTemp++)
+                {
+                    if (indexTemp == itemListArray.Length)
+                    {
+                        throw new ArgumentException("csv文件有误");
+                    }
+                    itemListArray[indexTemp].Add(rowItemList[indexTemp]);
+                }
+                if (indexTemp < itemListArray.Length - 1)
+                {
+                    throw new ArgumentException("csv文件有误");
                 }
             }
-
-            if (!IsFirst)
+            for (int i = 0; i < itemListArray.Length; i++)
             {
-                this.csvDT.Rows.Add(Row);
+                string key = itemListArray[i][0];
+                //去除第一个元素，其它元素集合作为value
+                itemListArray[i].RemoveAt(0);
+                csvInfoDic.Add(key, itemListArray[i]);
             }
-            IsFirst = false;
-            if (oddStartQuota)
+            return csvInfoDic;
+        }
+
+        public static Dictionary<string, List<string>> AnalysisCsvByFile(string csvPath)
+        {
+            if (File.Exists(csvPath))
             {
-                throw new Exception("数据格式有问题");
+                string csvInfo = File.ReadAllText(csvPath, Encoding.UTF8);
+                return AnalysisCsvByStr(csvInfo);
+            }
+            else
+            {
+                throw new FileNotFoundException("未找到文件：" + csvPath);
+            }
+        }
+
+        /// <summary>
+        /// 将CSV文件的数据读取到DataTable中
+        /// </summary>
+        /// <param name="fileName">CSV文件路径</param>
+        /// <returns>返回读取了CSV数据的DataTable</returns>
+        public static DataTable OpenCSV(string filePath)
+        {
+            Encoding encoding = Encoding.ASCII; //Encoding.ASCII;//
+            DataTable dt = new DataTable();
+            FileStream fs = new FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+
+            //StreamReader sr = new StreamReader(fs, Encoding.UTF8);
+            StreamReader sr = new StreamReader(fs, encoding);
+            //string fileContent = sr.ReadToEnd();
+            //encoding = sr.CurrentEncoding;
+            //记录每次读取的一行记录
+            string strLine = "";
+            //记录每行记录中的各字段内容
+            string[] aryLine = null;
+            string[] tableHead = null;
+            //标示列数
+            int columnCount = 0;
+            //标示是否是读取的第一行
+            bool IsFirst = true;
+            //逐行读取CSV中的数据
+            while ((strLine = sr.ReadLine()) != null)
+            {
+                //strLine = Common.ConvertStringUTF8(strLine, encoding);
+                //strLine = Common.ConvertStringUTF8(strLine);
+
+                if (IsFirst == true)
+                {
+                    tableHead = strLine.Split(',');
+                    IsFirst = false;
+                    columnCount = tableHead.Length;
+                    //创建列
+                    for (int i = 0; i < columnCount; i++)
+                    {
+                        DataColumn dc = new DataColumn(tableHead[i]);
+                        dt.Columns.Add(dc);
+                    }
+                }
+                else
+                {
+                    aryLine = strLine.Split(',');
+                    DataRow dr = dt.NewRow();
+                    for (int j = 0; j < columnCount; j++)
+                    {
+                        dr[j] = aryLine[j];
+                    }
+                    dt.Rows.Add(dr);
+                }
+            }
+            if (aryLine != null && aryLine.Length > 0)
+            {
+                dt.DefaultView.Sort = tableHead[0] + " " + "asc";
             }
 
+            sr.Close();
+            fs.Close();
+            return dt;
         }
 
 
         /// <summary>
-        /// 去掉格子的首尾引号，把双引号变成单引号
-
+        /// 将DataTable中数据写入到CSV文件中
         /// </summary>
-        /// <param name="fileCellData"></param>
-        /// <returns></returns>
-        private string GetHandleData(string fileCellData)
+        /// <param name="dt">提供保存数据的DataTable</param>
+        /// <param name="fileName">CSV的文件路径</param>
+        public static void SaveCSV(DataTable dt, string fullPath)
         {
-            if (fileCellData == "")
+            FileInfo fi = new FileInfo(fullPath);
+            if (!fi.Directory.Exists)
             {
-                return "";
+                fi.Directory.Create();
             }
-            if (IfOddStartQuota(fileCellData))
+            FileStream fs = new FileStream(fullPath, System.IO.FileMode.Create, System.IO.FileAccess.Write);
+            //StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.Default);
+            StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+            string data = "";
+            //写出列名称
+            for (int i = 0; i < dt.Columns.Count; i++)
             {
-                if (IfOddEndQuota(fileCellData))
+                data += dt.Columns[i].ColumnName.ToString();
+                if (i < dt.Columns.Count - 1)
                 {
-                    return fileCellData.Substring(1, fileCellData.Length - 2).Replace("\"\"", "\""); //去掉首尾引号，然后把双引号变成单引号
-                }
-                else
-                {
-                    throw new Exception("数据引号无法匹配" + fileCellData);
-                }
-            }
-            else
-            {
-                //考虑形如"" """" """""" 
-                if (fileCellData.Length > 2 && fileCellData[0] == '\"')
-                {
-                    fileCellData = fileCellData.Substring(1, fileCellData.Length - 2).Replace("\"\"", "\""); //去掉首尾引号，然后把双引号变成单引号
+                    data += ",";
                 }
             }
+            sw.WriteLine(data);
+            //写出各行数据
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                data = "";
+                for (int j = 0; j < dt.Columns.Count; j++)
+                {
+                    string str = dt.Rows[i][j].ToString();
+                    str = str.Replace("\"", "\"\"");//替换英文冒号 英文冒号需要换成两个冒号
+                    if (str.Contains(',') || str.Contains('"')
+                        || str.Contains('\r') || str.Contains('\n')) //含逗号 冒号 换行符的需要放到引号中
+                    {
+                        str = string.Format("\"{0}\"", str);
+                    }
 
-            return fileCellData;
+                    data += str;
+                    if (j < dt.Columns.Count - 1)
+                    {
+                        data += ",";
+                    }
+                }
+                sw.WriteLine(data);
+            }
+            sw.Close();
+            fs.Close();
         }
     }
 

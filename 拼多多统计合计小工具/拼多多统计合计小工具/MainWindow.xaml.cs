@@ -27,23 +27,26 @@ namespace 拼多多统计合计小工具
     {
         private string fileDir = "";
         private string fileName = ""; 
-        private string apiUrl = "http://video.zxchobits.com:8282/";
-        //private string apiUrl = "http://center.com/";
+        //private string apiUrl = "http://video.zxchobits.com:8282/";
+        private string apiUrl = "http://center.com/";
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             //选择文件
             OpenFileDialog dialog = new OpenFileDialog();
-            dialog.Filter = "文本文件|*.csv";
+            dialog.Filter = "文本文件|*.csv;*.xlsx";
             if (dialog.ShowDialog() == true)
             {
                 dir.Text = dialog.FileName;
+                FileInfo fileInfo = new FileInfo(dialog.FileName);
+                string filePath = copyFile(fileInfo);
+
                 log.Text = "开始上传文件";
-               Upload(dir.Text);
+               Upload(filePath);
 
             }
         }
@@ -51,6 +54,7 @@ namespace 拼多多统计合计小工具
         public void Upload(string file)
         {
             FileInfo info = new FileInfo(file);
+
              fileDir = info.DirectoryName;
             fileName = info.Name;
             string url = string.Format(apiUrl+"pdd/Upload/index");
@@ -143,5 +147,72 @@ namespace 拼多多统计合计小工具
             return result;
         }
 
+        private string copyFile(FileInfo file) {
+            //获取文件扩展
+            string filePath = "";
+            if (file.Extension == ".csv")
+            {
+                //复制文件一份
+                filePath = file.DirectoryName + "\\" + file.Name + ".xlsx";
+                //判断文件是否存在
+                if (!File.Exists(filePath)) {
+                    File.Copy(file.FullName, filePath);
+                }
+            }
+            else
+            {
+                filePath = file.FullName;
+            }
+
+            return filePath;
+
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //选择文件
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "文本文件|*.csv";
+            if (dialog.ShowDialog() == true)
+            {
+                FileInfo fileInfo = new FileInfo(dialog.FileName);
+                log.Text = "已加载文件【"+fileInfo.Name+"】【"+ DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "】\r\n";
+                dir.Text = dialog.FileName;
+                DataTable List =  CsvHelper.OpenCSV(dir.Text);
+                DataRow countRow = List.NewRow();
+                log.Text += "开始处理数据【" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "】\r\n";
+                foreach (DataRow row in List.Rows)
+                {
+                    System.Type t = countRow[3].GetType();
+                    if (t.Name == "DBNull") {
+                        countRow[3] = 0.0;
+                        countRow[4] = 0.0;
+                        countRow[5] = 0.0;
+                        countRow[6] = 0.0;
+                        countRow[7] = 0.0;
+                        countRow[8] = 0.0;
+                        countRow[9] = 0.0;
+                        countRow[10] = 0.0;
+                        countRow[11] = 0.0;
+                    }
+                    countRow[3] = Convert.ToDouble(countRow[3]) + Convert.ToDouble(row[3].ToString().Replace("\t",""));
+                    countRow[4] = Convert.ToDouble(countRow[4]) + Convert.ToDouble(row[4].ToString().Replace("\t",""));
+                    countRow[5] = Convert.ToDouble(countRow[5]) + Convert.ToDouble(row[5].ToString().Replace("\t",""));
+                    countRow[6] = Convert.ToDouble(countRow[6]) + Convert.ToDouble(row[6].ToString().Replace("\t",""));
+                    countRow[7] = Convert.ToDouble(countRow[7]) + Convert.ToDouble(row[7].ToString().Replace("\t",""));
+                    countRow[8] = Convert.ToDouble(countRow[8]) + Convert.ToDouble(row[8].ToString().Replace("\t",""));
+                    countRow[9] = Convert.ToDouble(countRow[9]) + Convert.ToDouble(row[9].ToString().Replace("\t",""));
+                    countRow[10] = Convert.ToDouble(countRow[10]) + Convert.ToDouble(row[10].ToString().Replace("\t",""));
+                    countRow[11] = Convert.ToDouble(countRow[11]) + Convert.ToDouble(row[11].ToString().Replace("\t",""));
+                }
+                List.Rows.Add(countRow);
+          
+                string fileName = fileInfo.FullName.Replace(fileInfo.Extension, "");
+                log.Text += "开始导出数据【" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "】\r\n";
+                CsvHelper.SaveCSV(List,fileName+"【统计】"+fileInfo.Extension);
+                log.Text += "文件已保存成功【" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "】\r\n";
+                log.Text += "文件路径【" + fileName + "【统计】" + fileInfo.Extension + "】\r\n";
+            }
+        }
     }
 }

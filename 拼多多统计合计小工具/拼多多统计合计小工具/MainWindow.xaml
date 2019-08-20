@@ -7,9 +7,11 @@
         mc:Ignorable="d"
         Title="自动求和工具" Height="450" Width="800">
     <Grid>
-        <TextBox x:Name="dir" Background="Azure" HorizontalAlignment="Left" Margin="96,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="33" Width="686" Grid.ColumnSpan="2"/>
+        <TextBox x:Name="dir" Background="Azure" HorizontalAlignment="Left" Margin="89,10,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="33" Width="693"/>
         <Button Content="选择文件" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="74" Height="33" Click="Button_Click"/>
-        <TextBlock x:Name="log" HorizontalAlignment="Left" Margin="10,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="361" Width="772" Grid.ColumnSpan="2"><Run Text="详细内容"/></TextBlock>
+        <TextBlock x:Name="log" HorizontalAlignment="Left" Margin="10,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="361" Width="772" Grid.ColumnSpan="2"><Run Text="详细内容"/><InlineUIContainer>
+                
+            </InlineUIContainer></TextBlock>
 
     </Grid>
 </Window>
