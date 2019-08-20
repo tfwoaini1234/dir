@@ -26,8 +26,9 @@ namespace 拼多多统计合计小工具
     public partial class MainWindow : Window
     {
         private string fileDir = "";
-        private string fileName = "";
+        private string fileName = ""; 
         private string apiUrl = "http://video.zxchobits.com:8282/";
+        //private string apiUrl = "http://center.com/";
         public MainWindow()
         {
             InitializeComponent();
@@ -79,7 +80,7 @@ namespace 拼多多统计合计小工具
                 }
             }
             catch (Exception e1) {
-                MessageBox.Show("上传失败：" + e1.Message);
+                MessageBox.Show("上传失败：" + e1.InnerException);
             }
             
         }
