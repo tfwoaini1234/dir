@@ -31,15 +31,17 @@ namespace 自动生成目录小工具
         public MainWindow()
         {
             InitializeComponent();
-            shuaxin();
+            //shuaxin();
             //while (true)
             //{
+            HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+            log.Text += DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss") + "启动刷新了一次\r\n";
 
-            //        //这里写代码
-            //dispatcherTimer = new DispatcherTimer();
-            //dispatcherTimer.Tick += new EventHandler(scanning);
-            //dispatcherTimer.Interval = new TimeSpan(1, 0, 0);
-            //dispatcherTimer.Start();
+            //这里写代码
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += new EventHandler(scanning);
+            dispatcherTimer.Interval = new TimeSpan(0, 10, 0);
+            dispatcherTimer.Start();
 
 
             //    //Thread.Sleep(200);
@@ -56,7 +58,8 @@ namespace 自动生成目录小工具
         private void scanning(object sender, EventArgs e) {
             log.Text = "";
             dispatcherTimer.Stop();
-            eachDir();
+            HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+            //eachDir();
             dispatcherTimer.Start();
             log.Text += DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss") +"刷新了一次\r\n";
             log.ScrollToEnd();
@@ -64,42 +67,42 @@ namespace 自动生成目录小工具
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.FolderBrowserDialog openFileDialog = new System.Windows.Forms.FolderBrowserDialog();
-            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)//注意，此处一定要手动引入System.Window.Forms空间，否则你如果使用默认的DialogResult会发现没有OK属性
-            {
-                dirName.Text = openFileDialog.SelectedPath;
-                dirPath = dirName.Text;
-            }
+            //System.Windows.Forms.FolderBrowserDialog openFileDialog = new System.Windows.Forms.FolderBrowserDialog();
+            //if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)//注意，此处一定要手动引入System.Window.Forms空间，否则你如果使用默认的DialogResult会发现没有OK属性
+            //{
+            //    dirName.Text = openFileDialog.SelectedPath;
+            //    dirPath = dirName.Text;
+            //}
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
 
-            log.Text = "";
-            try
-            {
-                DirectoryInfo mypath = new DirectoryInfo(dirPath);
-                if (!mypath.Exists)
-                {
-                    MessageBox.Show("你还没有选择文件夹", "警告");
-                }
-                else
-                {
-                    if (kg)
-                    {
-                        kg = false;
-                        //如果存在，就开始递归
-                        Thread thread = new Thread(eachDir);
-                        thread.Start();
-                    }
+            //log.Text = "";
+            //try
+            //{
+            //    DirectoryInfo mypath = new DirectoryInfo(dirPath);
+            //    if (!mypath.Exists)
+            //    {
+            //        MessageBox.Show("你还没有选择文件夹", "警告");
+            //    }
+            //    else
+            //    {
+            //        if (kg)
+            //        {
+            //            kg = false;
+            //            //如果存在，就开始递归
+            //            Thread thread = new Thread(eachDir);
+            //            thread.Start();
+            //        }
 
 
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("你还没有选择文件夹", "警告");
-            }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("你还没有选择文件夹", "警告");
+            //}
 
 
         }
