@@ -29,6 +29,8 @@ namespace 拼多多统计合计小工具
         private string fileName = ""; 
         //private string apiUrl = "http://video.zxchobits.com:8282/";
         private string apiUrl = "http://center.com/";
+        private string kdDir = "";//快递单号文件地址
+        private string fhDir = "";//发货单号文件地址
         public MainWindow()
         {
             InitializeComponent();
@@ -212,6 +214,48 @@ namespace 拼多多统计合计小工具
                 CsvHelper.SaveCSV(List,fileName+"【统计】"+fileInfo.Extension);
                 log.Text += "文件已保存成功【" + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:fff") + "】\r\n";
                 log.Text += "文件路径【" + fileName + "【统计】" + fileInfo.Extension + "】\r\n";
+            }
+        }
+
+
+        //选择快递单号表格
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "文本文件|*.csv";
+            if (dialog.ShowDialog() == true)
+            {
+                FileInfo fileInfo = new FileInfo(dialog.FileName);
+                kdDir = fileInfo.FullName;
+                kdText.Text = "文件已加载";
+            }
+        }
+
+        //选择发货单号表格
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog();
+            dialog.Filter = "文本文件|*.csv";
+            if (dialog.ShowDialog() == true)
+            {
+                FileInfo fileInfo = new FileInfo(dialog.FileName);
+                fhDir = fileInfo.FullName;
+                fhText.Text = "文件已加载";
+            }
+        }
+
+
+        //开始比对文件数据
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            //快递列表
+            DataTable kdList = CsvHelper.OpenCSV(kdDir);
+            //发货列表
+            DataTable fhList = CsvHelper.OpenCSV(fhDir);
+
+            foreach (DataRow row in kdList.Rows)
+            {
+
             }
         }
     }

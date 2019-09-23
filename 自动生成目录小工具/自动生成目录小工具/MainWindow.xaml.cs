@@ -35,7 +35,7 @@ namespace 自动生成目录小工具
             //while (true)
             //{
             log.Text = "";
-            HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+           // HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
             log.Text += HttpRequestHelper.HttpGet("http://center.zxchobits.com/zxchobits/dns/checkIp", "code=115599");
             log.Text = DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss") + "启动刷新了一次\r\n";
 
@@ -59,7 +59,7 @@ namespace 自动生成目录小工具
         }
         private void scanning(object sender, EventArgs e) {
             dispatcherTimer.Stop();
-            HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
+           // HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
             HttpRequestHelper.HttpGet("http://center.zxchobits.com/zxchobits/dns/checkIp?code=115599", "");
             //eachDir();
             dispatcherTimer.Start();
