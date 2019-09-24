@@ -5,6 +5,8 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -248,15 +250,66 @@ namespace 拼多多统计合计小工具
         //开始比对文件数据
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
+            
+            //string[] jiaoji = data1.Intersect(data2).ToArray();
+
             //快递列表
-            DataTable kdList = CsvHelper.OpenCSV(kdDir);
+            DataTable kdTable = CsvHelper.OpenCSV(kdDir);
+            List<String> kdList = new List<string>();
             //发货列表
-            DataTable fhList = CsvHelper.OpenCSV(fhDir);
-
-            foreach (DataRow row in kdList.Rows)
+            DataTable fhTable = CsvHelper.OpenCSV(fhDir);
+            DataTable fhTable2 = CsvHelper.OpenCSV(fhDir);
+            List<String> fhList = new List<string>();
+            foreach (DataRow row in kdTable.Rows)
             {
-
+                if(row[3].ToString() != "")
+                {
+                    kdList.Add(row[3].ToString());
+                }
             }
+            foreach (DataRow row2 in fhTable.Rows)
+            {
+                if(row2[33].ToString().Replace("\t", "") != "")
+                {
+                    fhList.Add(row2[33].ToString().Replace("\t", ""));
+                }
+            }
+            string[] kdArray = kdList.ToArray();
+            string[] fhArray = fhList.ToArray();
+            //string[] jiaoji = fhArray.Except(kdArray).ToArray();
+            string[] jiaoji = fhArray.Except(kdArray).ToArray();
+            List<String> jieguoList = new List<string>(jiaoji);
+            //导出
+
+            int n = 0;
+            DataTable newTable = new DataTable();
+            foreach ( DataRow row in fhTable.Rows)
+            {
+                
+                string findStr = row[33].ToString().Replace("\t", "");
+                if(findStr == "777001590050974")
+                {
+                    int s = 1;
+                }
+                string res = jieguoList.Find(c => c.Equals(findStr));
+                if(res == null)
+                {
+                    //DataRow dRow = newTable.NewRow();
+                    //dRow["1"] = "";
+                    //dRow[1] = (row[33]);
+                    //newTable.Rows.Add(dRow);
+                    row[33] = "------------------------------";
+                }
+                n++;
+            }
+           
+            FileInfo fileInfo = new FileInfo(fhDir);
+            string fileName = fileInfo.FullName.Replace(fileInfo.Extension, "");
+            CsvHelper.SaveCSV(fhTable, fileName + "【统计】" + ".csv");
+            fhLog.Text += "文件路径【" + fileName + "【统计】" + fileInfo.Extension + "】\r\n";
+
         }
+
+       
     }
 }

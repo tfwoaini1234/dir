@@ -16,7 +16,7 @@
         <TextBox x:Name="kdText" HorizontalAlignment="Left" Height="36" Margin="89,99,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="245"/>
         <Button Content="选择发货单表格" HorizontalAlignment="Left" Margin="339,99,0,0" VerticalAlignment="Top" Width="77" Height="36" FontSize="10" Click="Button_Click_3"/>
         <TextBox x:Name="fhText" HorizontalAlignment="Left" Height="36" Margin="421,99,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="245"/>
-        <TextBlock  HorizontalAlignment="Left" Margin="10,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="57" Width="772"/>
+        <TextBlock x:Name="fhLog" HorizontalAlignment="Left" Margin="10,140,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="57" Width="772"/>
         <Button Content="开始筛选" HorizontalAlignment="Left" Margin="671,99,0,0" VerticalAlignment="Top" Width="111" Height="36" Click="Button_Click_4"/>
 
     </Grid>
