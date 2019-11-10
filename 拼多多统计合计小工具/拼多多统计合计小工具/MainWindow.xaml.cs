@@ -279,7 +279,9 @@ namespace 拼多多统计合计小工具
         //开始比对文件数据
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            
+            DataTable dt = new DataTable();
+          
+           
             //string[] jiaoji = data1.Intersect(data2).ToArray();
 
             //快递列表
@@ -312,6 +314,8 @@ namespace 拼多多统计合计小工具
 
             int n = 0;
             DataTable newTable = new DataTable();
+            DataColumn dc = new DataColumn("单号");
+            newTable.Columns.Add(dc);
             foreach ( DataRow row in fhTable.Rows)
             {
                 
@@ -321,20 +325,18 @@ namespace 拼多多统计合计小工具
                     int s = 1;
                 }
                 string res = jieguoList.Find(c => c.Equals(findStr));
-                if(res == null)
+                if(res != null)
                 {
-                    //DataRow dRow = newTable.NewRow();
-                    //dRow["1"] = "";
-                    //dRow[1] = (row[33]);
-                    //newTable.Rows.Add(dRow);
-                    row[33] = "------------------------------";
+                    DataRow dRow = newTable.NewRow();
+                    dRow[0] = (row[33]);
+                    newTable.Rows.Add(dRow);
                 }
                 n++;
             }
            
             FileInfo fileInfo = new FileInfo(fhDir);
             string fileName = fileInfo.FullName.Replace(fileInfo.Extension, "");
-            CsvHelper.SaveCSV(fhTable, fileName + "【统计】" + ".csv");
+            CsvHelper.SaveCSV(newTable, fileName + "【统计】" + ".csv");
             fhLog.Text += "文件路径【" + fileName + "【统计】" + fileInfo.Extension + "】\r\n";
 
         }
