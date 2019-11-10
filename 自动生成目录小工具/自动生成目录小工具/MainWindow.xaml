@@ -12,6 +12,7 @@
         <TextBlock x:Name="dirName" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="选中的文件夹" VerticalAlignment="Top" Height="38" Width="567" FontSize="20"/>
         <Button Content="选择文件夹" Background="Azure"  HorizontalAlignment="Left" Margin="582,10,0,0" VerticalAlignment="Top" Width="100" Height="38" Click="Button_Click"/>
         <Button Content="开始同步" Background="LightBlue" HorizontalAlignment="Left" Margin="686,10,0,0" VerticalAlignment="Top" Width="100" Height="38" Click="Button_Click_1"/>
-        <TextBox x:Name="log" HorizontalAlignment="Left" Height="356" Margin="10,53,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="772"/>
+        <TextBox x:Name="log" HorizontalAlignment="Left" Height="54" Margin="10,53,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="772"/>
+        <TextBox x:Name="errorLog" HorizontalAlignment="Left" Height="134" Margin="10,112,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="776"/>
     </Grid>
 </Window>

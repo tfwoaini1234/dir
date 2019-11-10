@@ -8,6 +8,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -199,15 +200,43 @@ namespace 拼多多统计合计小工具
                         countRow[10] = 0.0;
                         countRow[11] = 0.0;
                     }
-                    countRow[3] = Convert.ToDouble(countRow[3]) + Convert.ToDouble(row[3].ToString().Replace("\t",""));
-                    countRow[4] = Convert.ToDouble(countRow[4]) + Convert.ToDouble(row[4].ToString().Replace("\t",""));
-                    countRow[5] = Convert.ToDouble(countRow[5]) + Convert.ToDouble(row[5].ToString().Replace("\t",""));
-                    countRow[6] = Convert.ToDouble(countRow[6]) + Convert.ToDouble(row[6].ToString().Replace("\t",""));
-                    countRow[7] = Convert.ToDouble(countRow[7]) + Convert.ToDouble(row[7].ToString().Replace("\t",""));
-                    countRow[8] = Convert.ToDouble(countRow[8]) + Convert.ToDouble(row[8].ToString().Replace("\t",""));
-                    countRow[9] = Convert.ToDouble(countRow[9]) + Convert.ToDouble(row[9].ToString().Replace("\t",""));
-                    countRow[10] = Convert.ToDouble(countRow[10]) + Convert.ToDouble(row[10].ToString().Replace("\t",""));
-                    countRow[11] = Convert.ToDouble(countRow[11]) + Convert.ToDouble(row[11].ToString().Replace("\t",""));
+                    string s3 = "0.0"; string s4 = "0.0"; string s5 = "0.0"; string s6 = "0.0"; string s7 = "0.0"; string s8 = "0.0"; string s9 = "0.0"; string s10 = "0.0"; string s11 = "0.0";
+                    string s = row[3].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc3 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc3.Count > 0) { s3 = mc3[0].ToString(); } else {mc3 = Regex.Matches(s, "\\d+");if (mc3.Count > 0){s3 = mc3[0].ToString();}}
+                    countRow[3] = Convert.ToDouble(countRow[3]) + Convert.ToDouble(s3);
+                     s = row[4].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc4 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc4.Count > 0){s4 = mc4[0].ToString(); } else { mc4 = Regex.Matches(s, "\\d+"); if (mc4.Count > 0) { s4 = mc4[0].ToString(); } }
+                    countRow[4] = Convert.ToDouble(countRow[4]) + Convert.ToDouble(s4);
+                     s = row[5].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc5 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc5.Count > 0){s5 = mc5[0].ToString(); } else { mc5 = Regex.Matches(s, "\\d+"); if (mc5.Count > 0) { s5 = mc5[0].ToString(); } }
+                    countRow[5] = Convert.ToDouble(countRow[5]) + Convert.ToDouble(s5);
+                     s = row[6].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc6 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc6.Count > 0){s6 = mc6[0].ToString(); } else { mc6 = Regex.Matches(s, "\\d+"); if (mc6.Count > 0) { s6 = mc6[0].ToString(); } }
+                    countRow[6] = Convert.ToDouble(countRow[6]) + Convert.ToDouble(s6);
+                     s = row[7].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc7 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc7.Count > 0){s7 = mc7[0].ToString(); } else { mc7 = Regex.Matches(s, "\\d+"); if (mc7.Count > 0) { s7 = mc7[0].ToString(); } }
+                    countRow[7] = Convert.ToDouble(countRow[7]) + Convert.ToDouble(s7);
+                     s = row[8].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc8 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc8.Count > 0){s8 = mc8[0].ToString(); } else { mc8 = Regex.Matches(s, "\\d+"); if (mc8.Count > 0) { s8 = mc8[0].ToString(); } }
+                    countRow[8] = Convert.ToDouble(countRow[8]) + Convert.ToDouble(s8);
+                     s = row[9].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc9 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc9.Count > 0){s9 = mc9[0].ToString(); } else { mc9 = Regex.Matches(s, "\\d+"); if (mc9.Count > 0) { s9 = mc9[0].ToString(); } }
+                    countRow[9] = Convert.ToDouble(countRow[9]) + Convert.ToDouble(s9);
+                     s = row[10].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc10 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc10.Count > 0){s10 = mc10[0].ToString(); } else { mc10 = Regex.Matches(s, "\\d+"); if (mc10.Count > 0) { s10 = mc10[0].ToString(); } }
+                    countRow[10] = Convert.ToDouble(countRow[10]) + Convert.ToDouble(s10);
+                     s = row[11].ToString().Replace("\t", "").Replace("\\\"", "");
+                    MatchCollection mc11 = Regex.Matches(s, "[1-9]\\d*\\.\\d*|0\\.\\d*[0 - 9]\\d*");
+                    if (mc11.Count > 0){s11 = mc11[0].ToString(); } else { mc11 = Regex.Matches(s, "\\d+"); if (mc11.Count > 0) { s11 = mc11[0].ToString(); } }
+                    countRow[11] = Convert.ToDouble(countRow[11]) + Convert.ToDouble(s11);
                 }
                 List.Rows.Add(countRow);
           
