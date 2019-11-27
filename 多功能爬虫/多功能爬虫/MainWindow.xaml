@@ -1,0 +1,73 @@
+﻿<Window x:Class="多功能爬虫.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:多功能爬虫"
+        mc:Ignorable="d"
+        MaxHeight="450"
+        MaxWidth="815"
+        MinHeight="450"
+        MinWidth="815"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid Background="Gray">
+        <!--行定义，2行-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <!--列定义，2列-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+        <Grid  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+            <!--水平布局，右对齐-->
+            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <TextBox Width="580" Height="80" Margin="10,10"  FontSize="20" Text="请输入需要爬的链接地址" Padding="5,25" TextWrapping="NoWrap">
+                    <TextBox.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="20"/>
+                            <Setter Property="BorderBrush" Value="#c1d0dc"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+            </StackPanel>
+        </Grid>
+        <Grid  Grid.Column="3" Grid.Row="0" >
+            <!--水平布局，右对齐-->
+            <StackPanel  Orientation="Horizontal" HorizontalAlignment="Stretch">
+                <Button x:Name="start"  Content="开始" Width="180" Height="80" Margin="10" FontSize="30" Background="#FFEC8B" Click="Button_Click">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="20"/>
+                            <Setter Property="BorderBrush" Value="#ff0000"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+                <Button x:Name="end"  Content="暂停" Width="180" Height="80" Margin="10" FontSize="30" Background="OrangeRed" Click="Button_Click">
+                    <Button.Resources>
+                        <Style TargetType="{x:Type Border}">
+                            <Setter Property="CornerRadius" Value="20"/>
+                            <Setter Property="BorderBrush" Value="#ff0000"/>
+                        </Style>
+                    </Button.Resources>
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+            <WebBrowser x:Name="wb" />
+
+            <TextBlock x:Name="log" Width="780" Height="330" Margin="10" Background="#FFEC8B">
+                <TextBlock.Resources>
+                    <Style TargetType="{x:Type Border}">
+                        <Setter Property="CornerRadius" Value="20"/>
+                        <Setter Property="BorderBrush" Value="#ff0000"/>
+                    </Style>
+                </TextBlock.Resources>
+                </TextBlock>
+        </Grid>
+    </Grid>
+</Window>
