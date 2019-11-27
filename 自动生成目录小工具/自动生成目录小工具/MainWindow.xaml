@@ -6,7 +6,6 @@
         xmlns:local="clr-namespace:自动生成目录小工具"
         mc:Ignorable="d"
         Title="MainWindow" Height="460" Width="810"
-        ResizeMode="NoResize"
         >
     <Grid>
         <TextBlock x:Name="dirName" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="选中的文件夹" VerticalAlignment="Top" Height="38" Width="567" FontSize="20"/>
