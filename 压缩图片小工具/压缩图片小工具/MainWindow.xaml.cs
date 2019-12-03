@@ -66,7 +66,7 @@ namespace 压缩图片小工具
             int number = Convert.ToInt32(i);
             number--;
                  Thread.Sleep(110);
-            Console.WriteLine("测试数字2：{0}", number);
+            Console.WriteLine("测试数字3：{0}", number);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
