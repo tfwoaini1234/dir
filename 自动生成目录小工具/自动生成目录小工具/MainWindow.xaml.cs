@@ -1,10 +1,19 @@
-﻿using System;
+﻿using AForge.Video.DirectShow;
+using Aliyun.Acs.Core.Profile;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,6 +27,7 @@ using System.Windows.Threading;
 
 namespace 自动生成目录小工具
 {
+    
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
     /// </summary>
@@ -27,27 +37,277 @@ namespace 自动生成目录小工具
         private string savePath = "D:/www/center/public/static/video/";
         private bool kg = true;
         private DispatcherTimer dispatcherTimer;
+        private string saveIp = "";
         private int copyNum = 0;
+        Dictionary<string, Dictionary<string, string>> zList = new Dictionary<string, Dictionary<string, string>>();
+        Dictionary<string, Dictionary<string, string>> imageList = new Dictionary<string, Dictionary<string, string>>();
+        private string apiUrl = "https://www.aitaotu.com";
         public MainWindow()
         {
             InitializeComponent();
-            //shuaxin();
-            //while (true)
-            //{
-            log.Text = "";
-           // HttpRequestHelper.HttpGet("http://video.zxchobits.com:8282/nas/dir/index", "");
-            log.Text += HttpRequestHelper.HttpGet("http://center.zxchobits.com/zxchobits/dns/checkIp", "code=115599");
-            log.Text = DateTime.Now.ToString("yyyy年MM月dd日 HH:mm:ss") + "启动刷新了一次\r\n";
-
-            //这里写代码
+            //定时任务
             dispatcherTimer = new DispatcherTimer();
-            dispatcherTimer.Tick += new EventHandler(scanning);
+            dispatcherTimer.Tick += new EventHandler(run);
             dispatcherTimer.Interval = new TimeSpan(0, 0, 30);
             dispatcherTimer.Start();
+            //bug();
+            //addOneList();
+            //ThreadPool.QueueUserWorkItem(o=>getImage());
+        }
+        
+        private void run(object sender, EventArgs e) {    
+            string logText = "";
+            string ip = getIp();
+            bool isIp = Regex.IsMatch(ip, @"^(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)$");
+            Console.WriteLine(ip);
+            if (isIp)
+            {
+                //对比ip是否变更
+                if (!saveIp.Equals(ip))
+                {
+                    //不相等就更新
+                    try
+                    {
+                        Dictionary<string, string> ditParam = new Dictionary<string, string>();
+                        ditParam.Add("Action", "UpdateDomainRecord");
+                        ditParam.Add("RecordId", "17595591211380736");
+                        ditParam.Add("RR", "home");//主机记录的关键字
+                        ditParam.Add("Type", "A");//解析类型的关键字
+                        ditParam.Add("Value", ip);//记录值的关键字
+
+                        qianming q = new qianming();
+                        q.ComputeSignature(ditParam);
+                        string param = string.Join("&", ditParam.Select(x => x.Key + "=" + HttpUtility.UrlEncode(x.Value)));
+                        //string url = InterFaceUrl + "?" + param;
+                        string InterFaceUrl = "http://alidns.aliyuncs.com"; //请求路径
+                        Console.WriteLine(InterFaceUrl + "?" + param);
+                        MyWebBrowser webBrowser1 = new MyWebBrowser();
+                        FileInfo file =  webBrowser1.DownloadFile(InterFaceUrl + "?" + param, "test.txt");
+                        saveIp = ip;
+                        this.Dispatcher.Invoke(new Action(delegate
+                        {
+                            //这里写代码
+                            string s = errorLog.Text;
+                            errorLog.Text = "接口请求成功\r\n";
+                            errorLog.Text += s;
+                        }));
+                    }
+                    catch (Exception e1)
+                    {
+                        
+                        Console.WriteLine(e1);
+                    }
+                }
+            }
+            else
+            {
+                logText = "未获取到IP";
+            }
+
+            this.Dispatcher.Invoke(new Action(delegate
+            {
+                //这里写代码
+                log.Text = logText;
+            }));
+        }
+
+        private  string getIp() {
+            try
+            {
+               // string res = HttpRequestHelper.HttpGet("http://ip.taobao.com/service/getIpInfo.php", "ip=myip");
+                MyWebBrowser webBrowser1 = new MyWebBrowser();
+                FileInfo file = webBrowser1.DownloadFile("http://ip.taobao.com/service/getIpInfo.php?ip=myip","ip.txt");
+                if (File.Exists(file.FullName))
+                {
+                    string text = System.IO.File.ReadAllText(file.FullName);
+                    Console.WriteLine(text);
+                    JObject json = (JObject)JsonConvert.DeserializeObject(text);
+                    if ((Int16)json["code"] == 0)
+                    {
+                        JObject data = (JObject)json["data"];
+                        string ip = (String)data["ip"];
+                        return ip;
+                    }
+                    else
+                    {
+                        return "";
+                    }
+                }
+                else
+                {
+                    return "";
+                }
+                
+            }
+            catch(Exception e)
+            {
+
+                this.Dispatcher.Invoke(new Action(delegate
+                {
+                    //这里写代码
+                    string s = log.Text;
+                    log.Text = e.Message + "\r\n";
+                    log.Text += s;
+                }));
+                return "";
+            }
+            
+        }
 
 
-            //    //Thread.Sleep(200);
-            //}
+        private  void addOneList() {
+
+            //获取初始的列表
+            MyWebBrowser webBrowser1 = new MyWebBrowser();
+            FileInfo file = webBrowser1.DownloadFile("https://www.aitaotu.com/", "index.txt");
+            if (File.Exists(file.FullName))
+            {
+                string text = System.IO.File.ReadAllText(file.FullName);
+                Regex reg = new Regex(@"(?is)<a[^>]*?href=(['""\s]?)(?<href>[^'""\s]*)\1[^>]*?>");
+                MatchCollection mm = reg.Matches(text);
+                foreach (Match m in mm)
+                {
+                    string it = m.Groups["href"].Value;
+                    if (it.IndexOf("http") == -1)
+                    {
+                        if (!zList.ContainsKey(it))
+                        {
+                            //不存在key
+                            Dictionary<string, string> item = new Dictionary<string, string>();
+                            item.Add("value", it);
+                            item.Add("isUse", "0");
+                            zList.Add(it,item);
+                            errorLog.Text += (it + "\r\n");
+                        }
+
+                    }
+                   
+                }
+                //获取图片地址
+                Regex regImg = new Regex(@"<img\b[^<>]*?\bsrc[\s\t\r\n]*=[\s\t\r\n]*[""']?[\s\t\r\n]*(?<imgUrl>[^\s\t\r\n""'<>]*)[^<>]*?/?[\s\t\r\n]*>", RegexOptions.IgnoreCase);
+
+                // 搜索匹配的字符串
+                MatchCollection matches = regImg.Matches(text);
+                foreach (Match m2 in matches)
+                {
+                    string it = m2.Groups["imgUrl"].Value;
+                    if (it.IndexOf("http") == -1)
+                    {
+                        it = apiUrl + it;
+                    }
+                    if (!imageList.ContainsKey(it))
+                    {
+                        //不存在key
+                        Dictionary<string, string> item = new Dictionary<string, string>();
+                        item.Add("value", it);
+                        item.Add("isUse", "0");
+                        imageList.Add(it, item);
+                        errorLog.Text += (it + "\r\n");
+                    }
+                }
+            }
+        }
+
+        private void getImage() {
+            Dictionary<string, string> img = new Dictionary<string, string>();
+            bool kg = true;
+            while (kg)
+            {
+                kg = false;
+                foreach (var item in imageList)
+                {
+                    img = (Dictionary<string, string>)item.Value;
+                    string isUse = img["isUse"];
+                    if ("0".Equals(isUse))
+                    {
+                        kg = true;
+                        //未使用,获取图片
+                        ImgSave(img["value"]);
+                        img["isUse"] = "1";
+                        break;
+                    }
+                }
+            }
+         
+            //开始下载图片
+
+        }
+
+        /// <summary>
+        /// 图片另存为
+        /// </summary>
+        /// <param name="url">路径</param>
+        public void ImgSave(string url)
+        {
+            //http://203.156.245.58/sipgl/index.jsp
+            url = "https://img.aitaotu.cc:8089/Thumb/2019/0228/79693d79a4d52295363c12bbfb9becc9.jpg";
+            WebRequest imgRequest = WebRequest.Create(url);
+
+            HttpWebResponse res;
+            try
+            {
+                res = (HttpWebResponse)imgRequest.GetResponse();
+            }
+            catch (WebException ex)
+            {
+
+                res = (HttpWebResponse)ex.Response;
+            }
+
+            if (res.StatusCode.ToString() == "OK")
+            {
+                System.Drawing.Image downImage = System.Drawing.Image.FromStream(imgRequest.GetResponse().GetResponseStream());
+
+                string deerory = string.Format(@"D:\img\{0}\", DateTime.Now.ToString("yyyy-MM-dd"));
+
+                string fileName = string.Format("{0}.png", DateTime.Now.ToString("HHmmssffff"));
+
+
+                if (!System.IO.Directory.Exists(deerory))
+                {
+                    System.IO.Directory.CreateDirectory(deerory);
+                }
+                downImage.Save(deerory + fileName);
+                downImage.Dispose();
+            }
+
+        }
+        private void bug() {
+            MyWebBrowser webBrowser1 = new MyWebBrowser();
+            FileInfo file = webBrowser1.DownloadFile("https://www.aitaotu.com/shanggan/", "index.txt");
+            
+            string text = System.IO.File.ReadAllText(file.FullName);
+            Regex reg = new Regex(@"(?is)<a[^>]*?href=(['""\s]?)(?<href>[^'""\s]*)\1[^>]*?>");
+            MatchCollection mm = reg.Matches(text);
+            foreach (Match m in mm)
+            {
+                errorLog.Text +=(m.Groups["href"].Value + "\r\n");
+            }
+            int q = text.IndexOf("list_3");
+            Regex regex = new Regex(@"<a.*href=""(/.+/|/.+\.html)"".*>", RegexOptions.ECMAScript);
+            MatchCollection match = regex.Matches(text);
+            for (int i = 0; i < match.Count; i++)
+            {
+                string str = match[i].Value;
+                log.Text += str + "\r\n";
+                string[] sArray = Regex.Split(str, "</a>", RegexOptions.IgnoreCase);
+                if (sArray.Length > 0)
+                {
+                    for (int s = 0; s < sArray.Length; s++)
+                    {
+                        string newstr = sArray[s];
+                        Regex regex2 = new Regex(@"/.+/|/.+\.html", RegexOptions.ECMAScript);
+
+                        Match match2 = regex2.Match(newstr);
+                        if (match2.Length > 0)
+                        {
+                           // errorLog.Text += match2.Value + "\r\n";
+                        }
+                    }
+
+                }
+            }
+
         }
 
         private void shuaxin() {
@@ -87,7 +347,16 @@ namespace 自动生成目录小工具
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-
+            FilterInfoCollection videoDevices;
+            VideoCaptureDevice videoSource;
+        videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            int selectedDeviceIndex = 0;
+            videoSource = new VideoCaptureDevice(videoDevices[selectedDeviceIndex].MonikerString);//连接摄像头。
+            videoSource.VideoResolution = videoSource.VideoCapabilities[selectedDeviceIndex];
+            
+            //videoDev.VideoSource = videoSource;
+            // set NewFrame event handler
+            //videoDev.Start();
             //log.Text = "";
             //try
             //{
