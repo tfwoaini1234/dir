@@ -27,6 +27,8 @@ namespace 音乐下载器
     /// </summary>
     public partial class MainWindow : Window
     {
+        private string savePath = "";
+        private int page = 1;
         public MainWindow()
         {
             InitializeComponent();
@@ -47,52 +49,130 @@ namespace 音乐下载器
             MessageBox.Show(checkBox.Tag.ToString());
         }
 
+        /**
+         * 
+         * 搜索
+         * 
+         */
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            searchF();
+        }
+
+        private void searchF()
+        {
+            //重置列表
+            musicList.Items.Clear();
             int id = 1;
-            string page = "1";
+            
             WebClient web = new WebClient();
-            string webSite = "http://mobilecdn.kugou.com/api/v3/search/song?format=json&keyword=" + search.Text + "&page=" + page + "&pagesize=100";
+            string webSite = "http://mobilecdn.kugou.com/api/v3/search/song?format=json&keyword=" + search.Text + "&page=" + page.ToString() + "&pagesize=100";
             byte[] buffer = web.DownloadData(webSite);
             string html = Encoding.UTF8.GetString(buffer);
             JObject kugou = JObject.Parse(html);
             List<JToken> all = kugou["data"]["info"].Children().ToList();
+            
             all.ForEach(x =>
             {
-            KugouResult kg = JsonConvert.DeserializeObject<KugouResult>(x.ToString());
-            //kg.hash = x["320hash"].ToString();    //320音质的hash值
-            if (kg.sqhash != "")
-            {
-                kg.key = GetMD5(kg.sqhash + "kgcloud");
-                webSite = "http://trackercdn.kugou.com/i/?cmd=4&hash=" + kg.sqhash + "&key=" + kg.key + "&pid=1&forceDown=0&vip=1";
-                buffer = web.DownloadData(webSite);
-                html = Encoding.UTF8.GetString(buffer);
-                JObject flac = JObject.Parse(html);
-                if (flac["status"].ToString() == "1")   //成功获取才添加到显示列表和Result中
+                KugouResult kg = JsonConvert.DeserializeObject<KugouResult>(x.ToString());
+                kg.hash320 = x["320hash"].ToString();    //320音质的hash值
+                Dictionary<string, string> s = new Dictionary<string, string>();
+                if (kg.hash320 != "") s.Add("hash320", kg.hash320);//320音质
+                if (kg.hash != "") s.Add("hash", kg.hash);//普通音质
+                if (kg.sqhash != "") s.Add("sqhash", kg.sqhash);//无损音质
+                if(s.Count > 0)
                 {
-                        string name = flac["fileName"].ToString();
-                        string ext = flac["extName"].ToString();
-                        string bt = flac["bitRate"].ToString();
-                        string size = (double.Parse(flac["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB";
-                        TimeSpan ts = new TimeSpan(0, 0, int.Parse(flac["timeLength"].ToString())); //把秒数换算成分钟数
-                        string time = (ts.Minutes + ":" + ts.Seconds.ToString("00"));
-                        string url = flac["url"].ToString().Replace("\\", "");
-                        musicList.Items.Add(new { id = id, name = flac["fileName"],ext=ext,bt=bt,size= size, time=time,url=url });
-                        id++;
-                        //SkinListBoxItem sl = new SkinListBoxItem(kg.filename);
-                        //resultListView.Items.Add(sl);
-
-                        //ListViewItem lvi = new ListViewItem();
-                        //lvi.Text = kg.filename;
-                        //lvi.SubItems.Add(flac["bitRate"].ToString());
-                        //lvi.SubItems.Add(flac["extName"].ToString());
-                        //lvi.SubItems.Add((double.Parse(flac["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB");  //将文件大小装换成MB的单位
-                        //TimeSpan ts = new TimeSpan(0, 0, int.Parse(flac["timeLength"].ToString())); //把秒数换算成分钟数
-                        //lvi.SubItems.Add(ts.Minutes + ":" + ts.Seconds.ToString("00"));
-                        //lvi.Tag = flac["url"].ToString().Replace("\\", "");
-                        //listViewItems.Add(lvi);
+                    foreach (KeyValuePair<string, string> hash in s)
+                    {
+                        
+                        string key = GetMD5(hash.Value + "kgcloud");
+                        webSite = "http://trackercdn.kugou.com/i/?cmd=4&hash=" + hash.Value + "&key=" + key + "&pid=1&forceDown=0&vip=1";
+                        buffer = web.DownloadData(webSite);
+                        html = Encoding.UTF8.GetString(buffer);
+                        JObject musicObj = JObject.Parse(html);
+                        if(musicObj != null)
+                        {
+                            if (musicObj["status"].ToString() == "1")   //成功获取才添加到显示列表和Result中
+                            {
+                                Console.WriteLine(x["songname"]);
+                                string name = x["songname"].ToString();
+                                string ext = musicObj["extName"].ToString();
+                                string bt = musicObj["bitRate"].ToString();
+                                string size = (double.Parse(musicObj["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB";
+                                TimeSpan ts = new TimeSpan(0, 0, int.Parse(musicObj["timeLength"].ToString())); //把秒数换算成分钟数
+                                string time = (ts.Minutes + ":" + ts.Seconds.ToString("00"));
+                                string url = musicObj["url"].ToString().Replace("\\", "");
+                                musicList.Items.Add(new { id = id, name = name, ext = ext, bt = bt, size = size, time = time, url = url });
+                                id++;
+                            }
+                        }
                     }
                 }
+               
+                //if (kg.sqhash != "")
+                //{
+                //    kg.key = GetMD5(kg.sqhash + "kgcloud");
+                //    webSite = "http://trackercdn.kugou.com/i/?cmd=4&hash=" + kg.sqhash + "&key=" + kg.key + "&pid=1&forceDown=0&vip=1";
+                //    buffer = web.DownloadData(webSite);
+                //    html = Encoding.UTF8.GetString(buffer);
+                //    JObject flac = JObject.Parse(html);
+                //    if (flac["status"].ToString() == "1")   //成功获取才添加到显示列表和Result中
+                //    {
+                //        string name = flac["fileName"].ToString();
+                //        string ext = flac["extName"].ToString();
+                //        string bt = flac["bitRate"].ToString();
+                //        string size = (double.Parse(flac["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB";
+                //        TimeSpan ts = new TimeSpan(0, 0, int.Parse(flac["timeLength"].ToString())); //把秒数换算成分钟数
+                //        string time = (ts.Minutes + ":" + ts.Seconds.ToString("00"));
+                //        string url = flac["url"].ToString().Replace("\\", "");
+                //        musicList.Items.Add(new { id = id, name = flac["fileName"], ext = ext, bt = bt, size = size, time = time, url = url });
+                //        id++;
+                //        //SkinListBoxItem sl = new SkinListBoxItem(kg.filename);
+                //        //resultListView.Items.Add(sl);
+
+                //        //ListViewItem lvi = new ListViewItem();
+                //        //lvi.Text = kg.filename;
+                //        //lvi.SubItems.Add(flac["bitRate"].ToString());
+                //        //lvi.SubItems.Add(flac["extName"].ToString());
+                //        //lvi.SubItems.Add((double.Parse(flac["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB");  //将文件大小装换成MB的单位
+                //        //TimeSpan ts = new TimeSpan(0, 0, int.Parse(flac["timeLength"].ToString())); //把秒数换算成分钟数
+                //        //lvi.SubItems.Add(ts.Minutes + ":" + ts.Seconds.ToString("00"));
+                //        //lvi.Tag = flac["url"].ToString().Replace("\\", "");
+                //        //listViewItems.Add(lvi);
+                //    }
+                //}
+                //if (kg.hash != "")
+                //{
+                //    kg.key = GetMD5(kg.hash + "kgcloud");
+                //    webSite = "http://trackercdn.kugou.com/i/?cmd=4&hash=" + kg.hash + "&key=" + kg.key + "&pid=1&forceDown=0&vip=1";
+                //    buffer = web.DownloadData(webSite);
+                //    html = Encoding.UTF8.GetString(buffer);
+                //    JObject flac = JObject.Parse(html);
+                //    if (flac["status"].ToString() == "1")   //成功获取才添加到显示列表和Result中
+                //    {
+                //        string name = flac["fileName"].ToString();
+                //        string ext = flac["extName"].ToString();
+                //        string bt = flac["bitRate"].ToString();
+                //        string size = (double.Parse(flac["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB";
+                //        TimeSpan ts = new TimeSpan(0, 0, int.Parse(flac["timeLength"].ToString())); //把秒数换算成分钟数
+                //        string time = (ts.Minutes + ":" + ts.Seconds.ToString("00"));
+                //        string url = flac["url"].ToString().Replace("\\", "");
+                //        musicList.Items.Add(new { id = id, name = flac["fileName"], ext = ext, bt = bt, size = size, time = time, url = url });
+                //        id++;
+                //        //SkinListBoxItem sl = new SkinListBoxItem(kg.filename);
+                //        //resultListView.Items.Add(sl);
+
+                //        //ListViewItem lvi = new ListViewItem();
+                //        //lvi.Text = kg.filename;
+                //        //lvi.SubItems.Add(flac["bitRate"].ToString());
+                //        //lvi.SubItems.Add(flac["extName"].ToString());
+                //        //lvi.SubItems.Add((double.Parse(flac["fileSize"].ToString()) / (1024 * 1024)).ToString("F2") + "MB");  //将文件大小装换成MB的单位
+                //        //TimeSpan ts = new TimeSpan(0, 0, int.Parse(flac["timeLength"].ToString())); //把秒数换算成分钟数
+                //        //lvi.SubItems.Add(ts.Minutes + ":" + ts.Seconds.ToString("00"));
+                //        //lvi.Tag = flac["url"].ToString().Replace("\\", "");
+                //        //listViewItems.Add(lvi);
+                //    }
+                //}
             });
         }
 
@@ -178,6 +258,57 @@ namespace 音乐下载器
             //显示百分比
             //label1.Content = (value / pbDown.Maximum) * 100 + "%";
         }
+
+        /**
+         * 
+         * 选择保存目录
+         * 
+         */
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.FolderBrowserDialog openFileDialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)//注意，此处一定要手动引入System.Window.Forms空间，否则你如果使用默认的DialogResult会发现没有OK属性ee
+            {
+                savePath = openFileDialog.SelectedPath;
+                DirectoryInfo path = new DirectoryInfo(savePath);
+                if (!path.Exists)
+                {
+                    //不存在就创建目录
+                    path.Create();
+                }
+                pathText.Text = savePath;
+            }
+        }
+
+        /**
+         * 
+         * 上一页
+         * 
+         */
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            if(page <= 1)
+            {
+                page = 1;
+            }
+            else
+            {
+                page--;
+            }
+            searchF();
+        }
+
+
+        /**
+         * 
+         * 下一页
+         * 
+         */
+        private void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            page++;
+            searchF();
+        }
     }
 
     class KugouResult
@@ -185,5 +316,9 @@ namespace 音乐下载器
         public string filename { get; set; }
         public string sqhash { get; set; }
         public string key { get; set; }
+
+        public string hash { get; set; }
+
+        public string hash320 {get; set;}
     }
 }
