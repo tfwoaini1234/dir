@@ -10,6 +10,7 @@
         MaxWidth="800"
         MinHeight="450"
         MinWidth="800"
+        Icon="logo.ico"
         Title="音乐下载器" Height="450" Width="800">
     <Grid Background="Azure">
         <TabControl  HorizontalAlignment="Left" Height="419" VerticalAlignment="Top" Width="792">
@@ -64,7 +65,7 @@
                             <ProgressBar Grid.Column="1" x:Name="pbDown" ></ProgressBar>
                         <Label Content="下载进度" Padding="7"/>
                     </Grid>
-                    <Button Grid.Column="2" Grid.Row="3">开始下载</Button>
+                    <Button Grid.Column="2" Grid.Row="3" Click="Button_Click_4">开始下载</Button>
                     <Button Grid.Column="1" Grid.Row="2" Click="Button_Click_2">上一页</Button>
                     <Button Grid.Column="2" Grid.Row="2" Click="Button_Click_3">下一页</Button>
                 </Grid>

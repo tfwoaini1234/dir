@@ -27,15 +27,14 @@ namespace 音乐下载器
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string savePath = "";
-        private int page = 1;
+        private string savePath = "";//保存目录
+        private int page = 1;//起始页数
+        List<Object> lists = new List<Object>();//搜索结果集合
+        int[] selectLists = { };
         public MainWindow()
         {
             InitializeComponent();
-            Dictionary<string, object> s = new Dictionary<string, object>();
-            s.Add("text", "fjdksl");
-       
-            musicList.Items.Add(new { id="1", name= "name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1" });
+          //  musicList.Items.Add(new { id="1", name= "name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1name1" });
         }
 
         /**
@@ -46,7 +45,7 @@ namespace 音乐下载器
         private void checkBox1_Click(object sender, RoutedEventArgs e)
         {
             var checkBox = sender as CheckBox;
-            MessageBox.Show(checkBox.Tag.ToString());
+            selectLists.Append(int.Parse(checkBox.Tag.ToString()));
         }
 
         /**
@@ -102,6 +101,8 @@ namespace 音乐下载器
                                 TimeSpan ts = new TimeSpan(0, 0, int.Parse(musicObj["timeLength"].ToString())); //把秒数换算成分钟数
                                 string time = (ts.Minutes + ":" + ts.Seconds.ToString("00"));
                                 string url = musicObj["url"].ToString().Replace("\\", "");
+                                
+                                lists.Add(new { id = id, name = name, ext = ext, bt = bt, size = size, time = time, url = url });
                                 musicList.Items.Add(new { id = id, name = name, ext = ext, bt = bt, size = size, time = time, url = url });
                                 id++;
                             }
@@ -308,6 +309,23 @@ namespace 音乐下载器
         {
             page++;
             searchF();
+        }
+
+        /**
+         * 
+         * 开始下载
+         * 
+         *
+         */
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            if(savePath == "")
+            {
+                MessageBox.Show("请先选择保存地址", "提示");
+            }
+            //获取被选择的集合
+            pbDown.Maximum = selectLists.Length;
+            pbDown.Value = 2;
         }
     }
 
